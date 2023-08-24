@@ -11,7 +11,7 @@ config()
       entities: ['dist/**/*.entity{.ts,.js}'],
       migrations:['dist/database/migrations/*{.ts,.js}'],
       logging:false,
-      synchronize:true,
+      synchronize:false,
 
     }
 
