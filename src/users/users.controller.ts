@@ -1,10 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,ParseIntPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 // import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserSignupDto } from './dto/user-signup.dto';
 import { UserSigninDto } from './dto/user-signin.dto';
 import { UserEntity } from './entities/user.entity';
+import { CurrentUser } from 'src/utils/decorators/currentUser.Decorator';
+import { AuthenticationGuard } from 'src/utils/guards/authenticationguard';
+import { AuthorizeRoles } from 'src/utils/decorators/authorized.roles';
+import { Roles } from 'src/utils/common/user-roles-enum';
+import { AuthorizationGuard } from 'src/utils/guards/authorization.guard';
 
 @Controller('/users')
 export class UsersController {
@@ -32,37 +37,46 @@ export class UsersController {
       token,
       user
     }
-
-  
-
-
-
-
+    
+    
+    
+    
+    
+    
     
   }
-
-
-
-
+  @UseGuards(AuthenticationGuard)
+  @Get('me')
+  getUser(@CurrentUser() currentUser:UserEntity){
+    console.log(currentUser)
+    return currentUser
+  }
+  
+   
+  
+  @AuthorizeRoles(Roles.ADMIN)
+  @UseGuards(AuthenticationGuard,AuthorizationGuard)
   @Get()
   async findAll():Promise<UserEntity[]> {
     return await this.usersService.findAll()
   }
-
+  
   @Get(':id')
- async  findOne(@Param('id') id: string) {
+  async  findOne(@Param('id') id: string):Promise<UserEntity> {
     return await this.usersService.findOne(+id);
   }
-
+  
   @Patch(':id')
   update(@Param('id',ParseIntPipe) id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
-
+  
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
+
+
 
   
 }
