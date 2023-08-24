@@ -12,6 +12,9 @@ export class ProductsService {
   constructor(@InjectRepository(ProductEntity) private productRepository:Repository<ProductEntity>,private readonly catagoriesService:CatagoriesService){}
   async create(createProductDto: CreateProductDto,currentUser:UserEntity) {
     const product= this.productRepository.create(createProductDto)
+    if(!product){
+      throw new BadRequestException("Product with this id dont exist")
+    }
     const category=await this.catagoriesService.findOne(+createProductDto.categoryId)
     product.category=category;
     product.addedBy=currentUser
@@ -96,7 +99,4 @@ export class ProductsService {
   return await this.productRepository.save(product) ;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
-  }
 }
